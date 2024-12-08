@@ -107,9 +107,9 @@ cron.schedule('0 6 * * *', () => {
     sendFollowup()
 });
 
-cron.schedule('*/20 * * * * *', () => {
-    console.log('running a task every 20 seconds');
-    sendFollowup()
+// cron.schedule('*/20 * * * * *', () => {
+//     console.log('running a task every 20 seconds');
+//     sendFollowup()
 
-});
+// });
 
