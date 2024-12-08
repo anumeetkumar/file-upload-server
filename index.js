@@ -6,13 +6,13 @@ const serveIndex = require('serve-index');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000; 
+const PORT = 3000;
 const PUBLIC_FOLDER = path.join(__dirname, 'public');
 
 // Define allowed origins
 const allowedOrigins = [
     /^(https?:\/\/localhost(:\d+)?)/, // Matches any port on localhost
-    'https://app.clourax.com'
+    'https://app.clourax.com',
 ];
 
 // Configure CORS to only allow requests from localhost (any port) or app.clourax.com
@@ -53,7 +53,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
             return res.status(400).send('No file uploaded');
         }
 
-        const publicUrl = `${req.protocol}://${req.get('host')}/${req.file.filename}`;
+        const publicUrl = `https://upload.clourax.com/${req.file.filename}`;
         res.json({ message: 'File uploaded successfully', url: publicUrl });
     } catch (error) {
         console.error(error);
