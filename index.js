@@ -4,6 +4,9 @@ const fs = require('fs');
 const multer = require('multer');
 const serveIndex = require('serve-index');
 const cors = require('cors');
+const { default: axios } = require('axios');
+require('dotenv').config();
+var cron = require('node-cron');
 
 const app = express();
 const PORT = 3000;
@@ -61,6 +64,21 @@ app.post('/upload', upload.single('file'), (req, res) => {
     }
 });
 
+app.get("/", async (req, res) => {
+    const secret = process.env.CRON_SECRET
+    const API_URL = process.env.API_SERVER_URL
+    try {
+        const resp = await axios.get(`${API_URL}/api/admin/notifications/whatsapp/followup`, { headers: { Authorization: `Bearer ${secret}` } });
+
+        res.json({ message: 'File uploaded successfully', });
+
+    } catch (error) {
+        console.log("followup cron ", error)
+
+    }
+
+})
+
 // Enable directory listing
 app.use('/files', express.static(PUBLIC_FOLDER), serveIndex(PUBLIC_FOLDER, { icons: true }));
 
@@ -72,3 +90,25 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`File server is running at http://localhost:${PORT}`);
 });
+
+const sendFollowup = async () => {
+    const secret = process.env.CRON_SECRET
+    const API_URL = process.env.API_SERVER_URL
+
+    try {
+        await axios.get(`${API_URL}/api/admin/notifications/whatsapp/followup`, { headers: { Authorization: `Bearer ${secret}` } });
+    } catch (error) {
+        console.log("sendFollowup error", error)
+    }
+}
+
+// running a task every day at 6 AM
+cron.schedule('0 6 * * *', () => {
+    sendFollowup()
+});
+
+// cron.schedule('*/20 * * * * *', () => {
+//     console.log('running a task every 20 seconds');
+//     sendFollowup()
+// });
+
