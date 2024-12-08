@@ -18,13 +18,14 @@ if (!fs.existsSync(PUBLIC_FOLDER)) {
 // Serve static files from the 'public' directory
 app.use(express.static(PUBLIC_FOLDER));
 
-// Configure multer to save files with original names in the public folder
+// Configure multer to save files with unique names in the public folder
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, PUBLIC_FOLDER);
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `${uniqueSuffix}-${file.originalname}`);
     },
 });
 const upload = multer({ storage });
@@ -36,12 +37,12 @@ app.post('/upload', upload.single('file'), (req, res) => {
             return res.status(400).send('No file uploaded');
         }
 
-        const publicUrl = `${req.protocol}://${req.get('host')}/${req.file.originalname}`;
+        const publicUrl = `${req.protocol}://${req.get('host')}/${req.file.filename}`;
         res.json({ message: 'File uploaded successfully', url: publicUrl });
     } catch (error) {
-
+        console.error(error);
+        res.status(500).send('Server error');
     }
-
 });
 
 // Enable directory listing
