@@ -8,7 +8,23 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000; 
 const PUBLIC_FOLDER = path.join(__dirname, 'public');
-app.use(cors());
+
+// Define allowed origins
+const allowedOrigins = [
+    /^(https?:\/\/localhost(:\d+)?)/, // Matches any port on localhost
+    'https://app.clourax.com'
+];
+
+// Configure CORS to only allow requests from localhost (any port) or app.clourax.com
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.some(regex => typeof regex === 'string' ? origin === regex : regex.test(origin))) {
+            callback(null, true); // Allow the request
+        } else {
+            callback(new Error('Not allowed by CORS'), false); // Reject the request
+        }
+    }
+}));
 
 // Ensure the public folder exists
 if (!fs.existsSync(PUBLIC_FOLDER)) {
