@@ -52,11 +52,11 @@ const upload = multer({ storage });
 // Upload endpoint
 app.post('/upload', upload.single('file'), (req, res) => {
     try {
+        console.log("hello")
         if (!req.file) {
             return res.status(400).send('No file uploaded');
         }
-
-        const publicUrl = `https://upload.clourax.com/${req.file.filename}`;
+        const publicUrl = `${process.env.PREFIX_URL}${req.file.filename}`;
         res.json({ message: 'File uploaded successfully', url: publicUrl });
     } catch (error) {
         console.error(error);
@@ -64,20 +64,20 @@ app.post('/upload', upload.single('file'), (req, res) => {
     }
 });
 
-app.get("/", async (req, res) => {
-    const secret = process.env.CRON_SECRET
-    const API_URL = process.env.API_SERVER_URL
-    try {
-        const resp = await axios.get(`${API_URL}/api/admin/notifications/whatsapp/followup`, { headers: { Authorization: `Bearer ${secret}` } });
+// app.get("/", async (req, res) => {
+//     const secret = process.env.CRON_SECRET
+//     const API_URL = process.env.API_SERVER_URL
+//     try {
+//         const resp = await axios.get(`${API_URL}/api/admin/notifications/whatsapp/followup`, { headers: { Authorization: `Bearer ${secret}` } });
 
-        res.json({ message: 'File uploaded successfully', });
+//         res.json({ message: 'File uploaded successfully', });
 
-    } catch (error) {
-        console.log("followup cron ", error)
+//     } catch (error) {
+//         console.log("followup cron ", error)
 
-    }
+//     }
 
-})
+// })
 
 // Enable directory listing
 app.use('/files', express.static(PUBLIC_FOLDER), serveIndex(PUBLIC_FOLDER, { icons: true }));
@@ -103,9 +103,9 @@ const sendFollowup = async () => {
 }
 
 // running a task every day at 6 AM
-cron.schedule('0 6 * * *', () => {
-    sendFollowup()
-});
+// cron.schedule('0 6 * * *', () => {
+//     sendFollowup()
+// });
 
 // cron.schedule('*/20 * * * * *', () => {
 //     console.log('running a task every 20 seconds');
